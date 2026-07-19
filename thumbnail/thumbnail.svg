@@ -1,0 +1,173 @@
+<svg width="1280" height="720" viewBox="0 0 1280 720" xmlns="http://www.w3.org/2000/svg">
+<defs>
+  <!-- Night sky / tunnel gradient background -->
+  <linearGradient id="skyGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#04040a"/>
+    <stop offset="55%" stop-color="#0a0e1a"/>
+    <stop offset="100%" stop-color="#000000"/>
+  </linearGradient>
+
+  <!-- Road gradient (perspective) -->
+  <linearGradient id="roadGrad" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#1a1a22"/>
+    <stop offset="100%" stop-color="#050507"/>
+  </linearGradient>
+
+  <!-- Motion blur speed streak gradient -->
+  <linearGradient id="streakBlue" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#00B4FF" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#00B4FF" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#00B4FF" stop-opacity="0"/>
+  </linearGradient>
+  <linearGradient id="streakWhite" x1="0" y1="0" x2="1" y2="0">
+    <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#ffffff" stop-opacity="0.6"/>
+    <stop offset="100%" stop-color="#ffffff" stop-opacity="0"/>
+  </linearGradient>
+
+  <!-- Carbon fiber weave pattern -->
+  <pattern id="carbonWeave" width="14" height="14" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <rect width="14" height="14" fill="#111114"/>
+    <rect width="7" height="7" fill="#1c1c20"/>
+    <rect x="7" y="7" width="7" height="7" fill="#1c1c20"/>
+    <rect width="14" height="14" fill="none" stroke="#050506" stroke-width="0.6"/>
+  </pattern>
+
+  <!-- Dashboard glow gradient -->
+  <radialGradient id="dashGlow" cx="50%" cy="100%" r="80%">
+    <stop offset="0%" stop-color="#00B4FF" stop-opacity="0.55"/>
+    <stop offset="60%" stop-color="#0060a0" stop-opacity="0.15"/>
+    <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+  </radialGradient>
+
+  <!-- Title text gradient (papaya) -->
+  <linearGradient id="papayaText" x1="0" y1="0" x2="0" y2="1">
+    <stop offset="0%" stop-color="#FFA24D"/>
+    <stop offset="55%" stop-color="#FF6A13"/>
+    <stop offset="100%" stop-color="#E0500A"/>
+  </linearGradient>
+
+  <filter id="glowOrange" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="10" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+
+  <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
+    <feGaussianBlur stdDeviation="8" result="blur"/>
+    <feMerge>
+      <feMergeNode in="blur"/>
+      <feMergeNode in="SourceGraphic"/>
+    </feMerge>
+  </filter>
+</defs>
+
+<!-- ============ BACKGROUND: night road / tunnel POV ============ -->
+<rect width="1280" height="720" fill="url(#skyGrad)"/>
+
+<!-- Road surface (perspective trapezoid), vanishing point centered -->
+<polygon points="640,260 470,720 810,720" fill="url(#roadGrad)"/>
+
+<!-- Road lane lines converging to vanishing point -->
+<g stroke="#FF6A13" stroke-width="6" opacity="0.55" filter="url(#glowOrange)">
+  <line x1="640" y1="280" x2="560" y2="720"/>
+  <line x1="640" y1="280" x2="720" y2="720"/>
+</g>
+<g stroke="#3a3a44" stroke-width="3" opacity="0.5">
+  <line x1="640" y1="270" x2="500" y2="720"/>
+  <line x1="640" y1="270" x2="780" y2="720"/>
+</g>
+
+<!-- Tunnel side walls (subtle) -->
+<polygon points="0,0 470,720 0,720" fill="#0d0d14" opacity="0.7"/>
+<polygon points="1280,0 810,720 1280,720" fill="#0d0d14" opacity="0.7"/>
+
+<!-- Speed light streaks -->
+<g filter="url(#glowBlue)">
+  <rect x="60" y="140" width="260" height="6" fill="url(#streakBlue)" transform="rotate(-4 190 143)"/>
+  <rect x="920" y="120" width="300" height="6" fill="url(#streakBlue)" transform="rotate(5 1070 123)"/>
+  <rect x="30" y="420" width="220" height="5" fill="url(#streakWhite)" transform="rotate(-3 140 422)"/>
+  <rect x="1000" y="440" width="240" height="5" fill="url(#streakWhite)" transform="rotate(3 1120 442)"/>
+  <rect x="150" y="600" width="200" height="5" fill="url(#streakBlue)" transform="rotate(-2 250 602)"/>
+  <rect x="900" y="610" width="220" height="5" fill="url(#streakBlue)" transform="rotate(2 1010 612)"/>
+</g>
+
+<!-- Distant glow at vanishing point (tunnel exit / city lights) -->
+<circle cx="640" cy="270" r="120" fill="#00B4FF" opacity="0.18" filter="url(#glowBlue)"/>
+
+<!-- ============ COCKPIT SILHOUETTE (windshield frame POV) ============ -->
+<!-- Upper windshield frame / A-pillars -->
+<polygon points="0,0 1280,0 1280,90 950,140 330,140 0,90" fill="#050507"/>
+<polygon points="0,0 1280,0 1280,90 950,140 330,140 0,90" fill="url(#carbonWeave)" opacity="0.9"/>
+
+<!-- Left A-pillar -->
+<polygon points="0,0 210,0 330,140 0,150" fill="#050507"/>
+<polygon points="0,0 210,0 330,140 0,150" fill="url(#carbonWeave)" opacity="0.9"/>
+<!-- Right A-pillar -->
+<polygon points="1070,0 1280,0 1280,150 950,140" fill="#050507"/>
+<polygon points="1070,0 1280,0 1280,150 950,140" fill="url(#carbonWeave)" opacity="0.9"/>
+
+<!-- Papaya accent pinstripe along windshield frame -->
+<polygon points="0,88 330,138 950,138 1280,88 1280,94 950,144 330,144 0,94" fill="#FF6A13" filter="url(#glowOrange)"/>
+
+<!-- ============ DASHBOARD (bottom, electric blue digital display) ============ -->
+<polygon points="0,720 0,560 260,520 1020,520 1280,560 1280,720" fill="#050507"/>
+<polygon points="0,720 0,560 260,520 1020,520 1280,560 1280,720" fill="url(#carbonWeave)" opacity="0.85"/>
+<polygon points="0,720 0,560 260,520 1020,520 1280,560 1280,720" fill="url(#dashGlow)"/>
+
+<!-- Papaya pinstripe on dash top edge -->
+<polygon points="0,558 260,518 1020,518 1280,558 1280,563 1020,524 260,524 0,564" fill="#FF6A13" filter="url(#glowOrange)"/>
+
+<!-- Digital tachometer cluster (left) -->
+<g filter="url(#glowBlue)">
+  <circle cx="300" cy="640" r="70" fill="none" stroke="#00B4FF" stroke-width="5" opacity="0.9"/>
+  <path d="M 245 665 A 70 70 0 0 1 355 665" fill="none" stroke="#FF6A13" stroke-width="8" stroke-linecap="round" opacity="0.95"/>
+  <text x="300" y="650" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#00B4FF" text-anchor="middle">9.5</text>
+  <text x="300" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#7fd4ff" text-anchor="middle">x1000 RPM</text>
+</g>
+
+<!-- Digital speed cluster (right) -->
+<g filter="url(#glowBlue)">
+  <circle cx="980" cy="640" r="70" fill="none" stroke="#00B4FF" stroke-width="5" opacity="0.9"/>
+  <text x="980" y="648" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#ffffff" text-anchor="middle">220</text>
+  <text x="980" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#7fd4ff" text-anchor="middle">KM/H</text>
+</g>
+
+<!-- Center dash readout -->
+<g filter="url(#glowBlue)">
+  <rect x="560" y="600" width="160" height="46" rx="6" fill="#020204" stroke="#00B4FF" stroke-width="2"/>
+  <text x="640" y="630" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" fill="#00B4FF" text-anchor="middle">NIGHT DRIVE</text>
+</g>
+
+<!-- ============ TITLE TEXT (papaya, racing cursive style) ============ -->
+<g filter="url(#glowOrange)">
+  <text x="640" y="330" font-family="'Brush Script MT', 'Segoe Script', cursive" font-style="italic"
+        font-size="108" font-weight="700" fill="url(#papayaText)" text-anchor="middle"
+        stroke="#3a1400" stroke-width="2" paint-order="stroke">
+    Night Drive
+  </text>
+  <text x="640" y="410" font-family="Arial, sans-serif" font-weight="900" letter-spacing="6"
+        font-size="46" fill="#ffffff" text-anchor="middle" stroke="#00B4FF" stroke-width="1.5">
+    SESSION #01
+  </text>
+</g>
+
+<!-- Subtitle strip -->
+<rect x="380" y="430" width="520" height="40" rx="4" fill="#050507" opacity="0.85"/>
+<text x="640" y="457" font-family="Arial, sans-serif" font-weight="700" letter-spacing="2"
+      font-size="22" fill="#00B4FF" text-anchor="middle">
+  MELODIC &amp; PROGRESSIVE HOUSE MIX
+</text>
+
+<!-- ============ OUTER CARBON FIBER FRAME ============ -->
+<rect x="0" y="0" width="1280" height="720" fill="none" stroke="#050507" stroke-width="26"/>
+<rect x="13" y="13" width="1254" height="694" fill="none" stroke="url(#carbonWeave)" stroke-width="20"/>
+<rect x="24" y="24" width="1232" height="672" fill="none" stroke="#FF6A13" stroke-width="4" filter="url(#glowOrange)"/>
+
+<!-- Brand mark, bottom-right corner -->
+<text x="1225" y="700" font-family="Arial, sans-serif" font-weight="800" letter-spacing="1.5"
+      font-size="20" fill="#FF8A3D" text-anchor="end" opacity="0.9">ETERNAL BEAT MEDIOS</text>
+
+</svg>

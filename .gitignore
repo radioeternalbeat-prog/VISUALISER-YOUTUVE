@@ -1,0 +1,14 @@
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Entornos / cachés
+__pycache__/
+*.pyc
+
+# Archivos de audio/video pesados que el usuario coloque localmente
+# (no forzamos su exclusión total por si querés versionarlos a propósito,
+# pero podés descomentar estas líneas si preferís no subir binarios grandes)
+# assets/backgrounds/*.mp4
+# assets/backgrounds/*.mov
+# output/*.mp4
