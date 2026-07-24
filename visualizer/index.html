@@ -8,7 +8,8 @@
   :root{
     --papaya:#FF6A13;
     --papaya-bright:#FF8A3D;
-    --electric-blue:#00B4FF;
+    --steel:#C9CDD3;
+    --steel-dim:#6E7278;
     --carbon:#0a0a0d;
     --carbon-2:#15151a;
   }
@@ -50,8 +51,8 @@
     top:50%; left:50%;
     transform:translate(-50%,-50%);
     text-align:center;
-    color:var(--electric-blue);
-    text-shadow: 0 0 18px rgba(0,180,255,0.9), 0 0 40px rgba(0,180,255,0.4);
+    color:var(--steel);
+    text-shadow: 0 0 18px rgba(201,205,211,0.9), 0 0 40px rgba(201,205,211,0.4);
     font-weight:800;
     letter-spacing:4px;
     font-size:34px;
@@ -88,7 +89,7 @@
     letter-spacing:1px;
   }
   #controls button:hover{ background:var(--papaya-bright); }
-  #controls label{ color:var(--electric-blue); font-weight:600; }
+  #controls label{ color:var(--steel); font-weight:600; }
   #zoomWrap{
     width:100%; height:100%;
     display:flex; align-items:center; justify-content:center;
@@ -121,7 +122,7 @@
 <script>
 /* ============================================================
    ETERNAL BEAT MEDIOS - Visualizer Tacómetro Circular
-   Estética: McLaren (Fibra de Carbono / Naranja Papaya / Azul Eléctrico)
+   Estética: identidad real del canal (Negro Carbono / Naranja Papaya / Gris Acero)
    ============================================================ */
 
 const audioFileInput = document.getElementById('audioFile');
@@ -201,7 +202,7 @@ fullscreenBtn.addEventListener('click', () => {
 // ---- Colors ----
 const PAPAYA = '#FF6A13';
 const PAPAYA_BRIGHT = '#FF8A3D';
-const BLUE = '#00B4FF';
+const STEEL = '#C9CDD3';
 const CARBON = '#0a0a0d';
 
 const CX = 960, CY = 540; // center of 1920x1080 canvas
@@ -239,7 +240,7 @@ function draw(){
 
   // Background radial glow
   const grad = ctx.createRadialGradient(0,0, glowRadius*0.3, 0,0, glowRadius*1.6);
-  grad.addColorStop(0, rpmZoneActive ? 'rgba(255,106,19,0.35)' : 'rgba(0,180,255,0.25)');
+  grad.addColorStop(0, rpmZoneActive ? 'rgba(255,106,19,0.35)' : 'rgba(201,205,211,0.22)');
   grad.addColorStop(1, 'rgba(0,0,0,0)');
   ctx.fillStyle = grad;
   ctx.beginPath();
@@ -266,7 +267,7 @@ function draw(){
 
   const activeSweep = sweep * Math.min(1, avgEnergy * 1.4 + bassSmooth*0.3);
   const arcGrad = ctx.createLinearGradient(-BASE_RADIUS, 0, BASE_RADIUS, 0);
-  arcGrad.addColorStop(0, BLUE);
+  arcGrad.addColorStop(0, STEEL);
   arcGrad.addColorStop(0.7, PAPAYA);
   arcGrad.addColorStop(1, PAPAYA_BRIGHT);
 
@@ -275,7 +276,7 @@ function draw(){
   ctx.strokeStyle = arcGrad;
   ctx.lineWidth = 26;
   ctx.lineCap = 'round';
-  ctx.shadowColor = rpmZoneActive ? PAPAYA : BLUE;
+  ctx.shadowColor = rpmZoneActive ? PAPAYA : STEEL;
   ctx.shadowBlur = 30;
   ctx.stroke();
   ctx.shadowBlur = 0;
@@ -306,7 +307,7 @@ function draw(){
     ctx.beginPath();
     ctx.moveTo(x1,y1);
     ctx.lineTo(x2,y2);
-    ctx.strokeStyle = smoothLevels[i] > 0.7 ? PAPAYA_BRIGHT : BLUE;
+    ctx.strokeStyle = smoothLevels[i] > 0.7 ? PAPAYA_BRIGHT : STEEL;
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
     ctx.globalAlpha = 0.85;
@@ -363,7 +364,7 @@ function drawSpeedLines(energy){
     ctx.beginPath();
     ctx.moveTo(s.x, s.y);
     ctx.lineTo(s.x + s.len, s.y);
-    ctx.strokeStyle = `rgba(0,180,255,${s.alpha})`;
+    ctx.strokeStyle = `rgba(201,205,211,${s.alpha})`;
     ctx.lineWidth = 2;
     ctx.stroke();
   }

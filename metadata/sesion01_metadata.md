@@ -35,14 +35,24 @@ Progressive House Mix 2026 for Night Driving | Melodic Techno & Deep House
 
 ## Descripción
 
+**Versión actualizada** — incorpora tu tagline real ("El Sonido Sin Fronteras"),
+tu ubicación (Valparaíso, Chile) y tus redes reales ya confirmadas en el canal,
+además de sumar palabras clave extra para reforzar el SEO (idioma, ubicación,
+tipo de contenido):
+
 ```
 🏎️ NIGHT DRIVE — SESSION #01 🏎️
 Melodic & Progressive House Mix 2026 | Eternal Beat Medios
 
-Una hora de viaje sonoro entre luces de neón, carreteras nocturnas y bajos
-progresivos. Esta es la primera sesión oficial de Eternal Beat Medios: una
-selección de Progressive House y Melodic Deep House pensada para acompañar
-tu drive nocturno, tu sesión de estudio o tu after hours.
+Eternal Beat Medios | El Sonido Sin Fronteras 🚀🎵
+Tu plataforma multimedia dedicada a la música electrónica, DJs en vivo,
+streaming, cultura musical y producciones audiovisuales, transmitiendo desde
+Valparaíso, Chile para el mundo.
+
+Esta es la primera sesión oficial del canal: una hora de viaje sonoro entre
+luces de neón, carreteras nocturnas y bajos progresivos. Una selección de
+Progressive House y Melodic House pensada para tu drive nocturno, tu sesión
+de estudio o tu after hours.
 
 🎧 Escuchá con buenos auriculares o en tu sistema de audio del auto.
 🔔 Suscribite y activá la campana — todas las semanas subimos una nueva sesión.
@@ -57,19 +67,20 @@ tu drive nocturno, tu sesión de estudio o tu after hours.
 ────────────────────
 📲 SEGUINOS
 ────────────────────
-Instagram: [tu link]
-SoundCloud: [tu link]
-Spotify: [tu link]
-Sello / Radio Online: [tu link]
+Instagram: https://instagram.com/eternalbeatmedioscl
+Twitch: https://twitch.tv/eternalbeatradiotv
+Facebook: https://facebook.com/EternalBeatRadio
+YouTube: https://youtube.com/@eternalbeatmedioscl
 
 ────────────────────
 ⚖️ DERECHOS Y CONTACTO
 ────────────────────
 Todos los tracks pertenecen a sus respectivos artistas y sellos. Si sos
 titular de derechos de algún track incluido y querés que sea retirado o
-acreditado de otra forma, escribinos a: [tu email de contacto]
+acreditado de otra forma, escribinos por el correo de contacto disponible
+en la sección "Acerca de" del canal.
 
-#ProgressiveHouse #MelodicHouse #DeepHouse #NightDrive #EternalBeatMedios
+#ProgressiveHouse #MelodicHouse #DeepHouse #NightDrive #EternalBeatMedios #Valparaiso #Chile
 ```
 
 > ⚠️ Importante: reemplazá el tracklist con los nombres reales de los tracks
@@ -77,13 +88,23 @@ acreditado de otra forma, escribinos a: [tu email de contacto]
 > (la gente salta a su parte favorita) y el SEO (YouTube indexa cada nombre
 > de artista/track como si fuera texto de búsqueda adicional).
 
+> ✅ Ya actualicé los links de redes con los reales de tu canal (Instagram,
+> Twitch, Facebook). Verificá que las URLs sean exactamente las tuyas antes
+> de publicar — el link de Instagram en tu "Acerca de" tenía parámetros de
+> tracking (`?igsh=...`) que acorté a la URL limpia del perfil.
+
 ---
 
 ## Tags (separados por coma, pegar directo en YouTube Studio)
 
 ```
-progressive house, melodic house, deep house mix, progressive house mix 2026, night drive music, melodic techno, chill house mix, driving music mix, dj set progressive house, ben böhmer style, yotto style, lane 8 style, afterlife style music, deep house 2026, house music mix, eternal beat medios, radio online, dj mix 1 hour, study music house, chillvibes, electronic music mix, night driving playlist, car music mix, ambient house, organic house, downtempo house
+progressive house, melodic house, deep house mix, progressive house mix 2026, night drive music, melodic techno, chill house mix, driving music mix, dj set progressive house, ben böhmer style, yotto style, lane 8 style, afterlife style music, deep house 2026, house music mix, eternal beat medios, radio online, dj mix 1 hour, study music house, chillvibes, electronic music mix, night driving playlist, car music mix, ambient house, organic house, downtempo house, musica electronica chile, radio online chile, valparaiso electronic music, dj chile, musica para manejar de noche
 ```
+
+> Se agregaron 5 tags nuevos con ubicación/idioma (`chile`, `valparaiso`) para
+> capturar búsquedas locales, ya que tu canal se identifica como transmitiendo
+> desde Valparaíso — esto ayuda a aparecer en "Explorar" para audiencia chilena
+> además de la audiencia internacional de progressive house.
 
 ---
 
@@ -129,6 +150,6 @@ Usá el archivo generado en `../thumbnail/thumbnail_final.png` (exportado desde
 - [ ] Reemplazar el tracklist de ejemplo con los tracks reales y sus timestamps
 - [ ] Confirmar que tenés derecho de uso de cada track (licencia, royalty-free, o autorización)
 - [ ] Exportar la miniatura final en PNG desde `thumbnail.svg`
-- [ ] Completar los links reales de redes sociales en la descripción
-- [ ] Poner un email de contacto real para reclamos de derechos
+- [x] Links reales de redes sociales ya incluidos en la descripción (Instagram, Twitch, Facebook)
+- [ ] Verificar que el correo de contacto esté visible en la sección "Acerca de" del canal
 - [ ] Crear la playlist "Night Drive Sessions" en el canal

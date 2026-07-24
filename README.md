@@ -1,8 +1,8 @@
 # Eternal Beat Medios — Kit de Lanzamiento "Sesión #01"
 
 Kit técnico completo para producir y publicar el primer video del canal de
-YouTube de tu radio online, con la identidad visual estilo McLaren (fibra de
-carbono + naranja papaya + azul eléctrico) y el concepto "Night Drive".
+YouTube de tu radio online, con la identidad visual real de Eternal Beat Medios
+(negro carbono + naranja papaya + gris acero) y el concepto "Night Drive".
 
 ```
 eternal-beat-medios/
@@ -89,11 +89,14 @@ Abrí `metadata/sesion01_metadata.md` y:
 
 ## Sobre la estética de marca (para mantener consistencia en futuros videos)
 
-- **Naranja Papaya**: `#FF6A13` (acentos, título, marco)
-- **Azul Eléctrico**: `#00B4FF` (tablero, datos digitales, glow)
-- **Fibra de Carbono / Carbón**: `#0a0a0d` (fondos, marcos, estructura)
+Paleta alineada a la identidad real del canal (banner y logo de Eternal Beat Medios):
+
+- **Naranja Papaya**: `#FF6A13` (acentos, título, marco, ícono de onda del logo)
+- **Gris Acero**: `#C9CDD3` (tablero, datos digitales, glow — reemplaza al azul del brief original de Gemini)
+- **Negro Carbono**: `#0a0a0d` (fondos, marcos, estructura)
 - **Tipografía título**: cursiva estilo racing (ver notas de fuente en `thumbnail/README.md`)
 - **Concepto**: "Night Drive" — velocidad, cabina de auto deportivo, ciudad/carretera nocturna
+- **Logo**: el ícono de onda de audio en naranja sobre círculo negro, ya usado en el canal real
 
 Guardá esta paleta para que todos los videos futuros del canal mantengan la
 misma identidad visual y el algoritmo/audiencia empiece a reconocer tu

@@ -7,7 +7,7 @@ Combina automáticamente (sin grabar pantalla):
   - Tu pista de audio (el DJ set / mezcla ya exportada)
   - Un video o imagen de fondo en loop (carretera, túnel, etc.)
   - Un espectro/ecualizador reactivo generado directamente por FFmpeg
-    a partir del audio (colorizado en Naranja Papaya / Azul Eléctrico)
+    a partir del audio (colorizado en Naranja Papaya / Gris Acero)
   - Un marco estilo "fibra de carbono" con acento papaya
   - (Opcional) tu logo centrado
 
@@ -33,10 +33,10 @@ import sys
 WIDTH = 1920
 HEIGHT = 1080
 
-# Paleta de marca
+# Paleta de marca (identidad real del canal: Negro Carbono / Naranja Papaya / Gris Acero)
 CARBON = "0x0a0a0d"
 PAPAYA = "0xFF6A13"
-BLUE = "0x00B4FF"
+STEEL = "0xC9CDD3"
 
 IMAGE_EXTS = {".png", ".jpg", ".jpeg", ".bmp", ".webp"}
 

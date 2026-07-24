@@ -15,9 +15,9 @@
 
   <!-- Motion blur speed streak gradient -->
   <linearGradient id="streakBlue" x1="0" y1="0" x2="1" y2="0">
-    <stop offset="0%" stop-color="#00B4FF" stop-opacity="0"/>
-    <stop offset="50%" stop-color="#00B4FF" stop-opacity="0.85"/>
-    <stop offset="100%" stop-color="#00B4FF" stop-opacity="0"/>
+    <stop offset="0%" stop-color="#C9CDD3" stop-opacity="0"/>
+    <stop offset="50%" stop-color="#C9CDD3" stop-opacity="0.85"/>
+    <stop offset="100%" stop-color="#C9CDD3" stop-opacity="0"/>
   </linearGradient>
   <linearGradient id="streakWhite" x1="0" y1="0" x2="1" y2="0">
     <stop offset="0%" stop-color="#ffffff" stop-opacity="0"/>
@@ -35,8 +35,8 @@
 
   <!-- Dashboard glow gradient -->
   <radialGradient id="dashGlow" cx="50%" cy="100%" r="80%">
-    <stop offset="0%" stop-color="#00B4FF" stop-opacity="0.55"/>
-    <stop offset="60%" stop-color="#0060a0" stop-opacity="0.15"/>
+    <stop offset="0%" stop-color="#C9CDD3" stop-opacity="0.45"/>
+    <stop offset="60%" stop-color="#5a5d63" stop-opacity="0.15"/>
     <stop offset="100%" stop-color="#000000" stop-opacity="0"/>
   </radialGradient>
 
@@ -55,7 +55,7 @@
     </feMerge>
   </filter>
 
-  <filter id="glowBlue" x="-50%" y="-50%" width="200%" height="200%">
+  <filter id="glowSteel" x="-50%" y="-50%" width="200%" height="200%">
     <feGaussianBlur stdDeviation="8" result="blur"/>
     <feMerge>
       <feMergeNode in="blur"/>
@@ -85,7 +85,7 @@
 <polygon points="1280,0 810,720 1280,720" fill="#0d0d14" opacity="0.7"/>
 
 <!-- Speed light streaks -->
-<g filter="url(#glowBlue)">
+<g filter="url(#glowSteel)">
   <rect x="60" y="140" width="260" height="6" fill="url(#streakBlue)" transform="rotate(-4 190 143)"/>
   <rect x="920" y="120" width="300" height="6" fill="url(#streakBlue)" transform="rotate(5 1070 123)"/>
   <rect x="30" y="420" width="220" height="5" fill="url(#streakWhite)" transform="rotate(-3 140 422)"/>
@@ -95,7 +95,7 @@
 </g>
 
 <!-- Distant glow at vanishing point (tunnel exit / city lights) -->
-<circle cx="640" cy="270" r="120" fill="#00B4FF" opacity="0.18" filter="url(#glowBlue)"/>
+<circle cx="640" cy="270" r="120" fill="#C9CDD3" opacity="0.18" filter="url(#glowSteel)"/>
 
 <!-- ============ COCKPIT SILHOUETTE (windshield frame POV) ============ -->
 <!-- Upper windshield frame / A-pillars -->
@@ -121,24 +121,24 @@
 <polygon points="0,558 260,518 1020,518 1280,558 1280,563 1020,524 260,524 0,564" fill="#FF6A13" filter="url(#glowOrange)"/>
 
 <!-- Digital tachometer cluster (left) -->
-<g filter="url(#glowBlue)">
-  <circle cx="300" cy="640" r="70" fill="none" stroke="#00B4FF" stroke-width="5" opacity="0.9"/>
+<g filter="url(#glowSteel)">
+  <circle cx="300" cy="640" r="70" fill="none" stroke="#C9CDD3" stroke-width="5" opacity="0.9"/>
   <path d="M 245 665 A 70 70 0 0 1 355 665" fill="none" stroke="#FF6A13" stroke-width="8" stroke-linecap="round" opacity="0.95"/>
-  <text x="300" y="650" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#00B4FF" text-anchor="middle">9.5</text>
-  <text x="300" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#7fd4ff" text-anchor="middle">x1000 RPM</text>
+  <text x="300" y="650" font-family="Arial, sans-serif" font-size="34" font-weight="800" fill="#C9CDD3" text-anchor="middle">9.5</text>
+  <text x="300" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#9aa0a6" text-anchor="middle">x1000 RPM</text>
 </g>
 
 <!-- Digital speed cluster (right) -->
-<g filter="url(#glowBlue)">
-  <circle cx="980" cy="640" r="70" fill="none" stroke="#00B4FF" stroke-width="5" opacity="0.9"/>
+<g filter="url(#glowSteel)">
+  <circle cx="980" cy="640" r="70" fill="none" stroke="#C9CDD3" stroke-width="5" opacity="0.9"/>
   <text x="980" y="648" font-family="Arial, sans-serif" font-size="40" font-weight="800" fill="#ffffff" text-anchor="middle">220</text>
-  <text x="980" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#7fd4ff" text-anchor="middle">KM/H</text>
+  <text x="980" y="672" font-family="Arial, sans-serif" font-size="12" letter-spacing="2" fill="#9aa0a6" text-anchor="middle">KM/H</text>
 </g>
 
 <!-- Center dash readout -->
-<g filter="url(#glowBlue)">
-  <rect x="560" y="600" width="160" height="46" rx="6" fill="#020204" stroke="#00B4FF" stroke-width="2"/>
-  <text x="640" y="630" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" fill="#00B4FF" text-anchor="middle">NIGHT DRIVE</text>
+<g filter="url(#glowSteel)">
+  <rect x="560" y="600" width="160" height="46" rx="6" fill="#020204" stroke="#C9CDD3" stroke-width="2"/>
+  <text x="640" y="630" font-family="Arial, sans-serif" font-size="18" letter-spacing="3" fill="#C9CDD3" text-anchor="middle">NIGHT DRIVE</text>
 </g>
 
 <!-- ============ TITLE TEXT (papaya, racing cursive style) ============ -->
@@ -149,7 +149,7 @@
     Night Drive
   </text>
   <text x="640" y="410" font-family="Arial, sans-serif" font-weight="900" letter-spacing="6"
-        font-size="46" fill="#ffffff" text-anchor="middle" stroke="#00B4FF" stroke-width="1.5">
+        font-size="46" fill="#ffffff" text-anchor="middle" stroke="#C9CDD3" stroke-width="1.5">
     SESSION #01
   </text>
 </g>
@@ -157,7 +157,7 @@
 <!-- Subtitle strip -->
 <rect x="380" y="430" width="520" height="40" rx="4" fill="#050507" opacity="0.85"/>
 <text x="640" y="457" font-family="Arial, sans-serif" font-weight="700" letter-spacing="2"
-      font-size="22" fill="#00B4FF" text-anchor="middle">
+      font-size="22" fill="#C9CDD3" text-anchor="middle">
   MELODIC &amp; PROGRESSIVE HOUSE MIX
 </text>
 
