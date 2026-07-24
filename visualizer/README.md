@@ -15,13 +15,33 @@ circular (estilo McLaren) que reacciona al bajo/kick de tu mezcla de Progressive
    - Configurá OBS a 1920x1080, 30fps, y grabá "Captura de Pantalla" o "Captura de Ventana".
    - Esto te da el archivo de video final con el visualizer ya sincronizado al audio.
 
+## Logo
+
+El logo real del canal (`../assets/logo/logo.png`) ya está integrado en el centro
+del tacómetro y **pulsa/vibra sutilmente al ritmo del bajo/kick** (efecto descrito
+en la ficha técnica original). Si el archivo no se encuentra, cae automáticamente
+en un texto de respaldo ("ETERNAL BEAT / MEDIOS") para que el visualizer nunca se
+rompa visualmente.
+
+⚠️ **Importante sobre cómo abrir el archivo**: el logo se carga con una ruta
+relativa (`../assets/logo/logo.png`). Esto funciona perfecto si abrís `index.html`
+directamente por doble clic (protocolo `file://`) o si servís *toda la carpeta del
+repositorio* con un servidor local. Si servís solo la carpeta `visualizer/` de forma
+aislada, esa ruta relativa no va a encontrar la imagen y verás el texto de respaldo.
+
+Para reemplazar el logo por una versión nueva, simplemente sobrescribí
+`assets/logo/logo.png` (mismo nombre de archivo) o cambiá la ruta en el atributo
+`src` del `<img id="logoImg">` dentro de `index.html`.
+
 ## Personalización rápida
 
 Abrí `index.html` con un editor de texto y buscá estas partes:
 
-- **Colores**: constantes `PAPAYA`, `PAPAYA_BRIGHT`, `BLUE` cerca de la línea 190.
-- **Texto del logo central**: `<div id="logoLabel">ETERNAL BEAT<small>MEDIOS</small></div>`
-  (reemplazalo por una imagen `<img>` si ya tenés el logo diseñado, dentro de `assets/logo/`).
+- **Colores**: constantes `PAPAYA`, `PAPAYA_BRIGHT`, `STEEL` cerca de la línea 190.
+- **Tamaño del logo**: `width:150px; height:150px;` en el selector `#logoLabel`.
+- **Intensidad del pulso del logo**: en la función `draw()`, la línea
+  `const logoScale = 1 + bassSmooth * 0.18 + ...` — subí el `0.18` si querés que
+  vibre más fuerte.
 - **Sensibilidad al bajo**: variable `bassBins` (cuántas frecuencias bajas se usan) y el
   multiplicador `* 1.4` / `* 1.3` en el cálculo del "RPM" — subilo si querés que reaccione más fuerte.
 

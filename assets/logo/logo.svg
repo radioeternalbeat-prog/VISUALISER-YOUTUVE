@@ -1,0 +1,42 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <!--
+    Eternal Beat Medios — Logo (recreado vectorialmente a partir del isotipo
+    real del canal: círculo carbono, anillo papaya, onda de audio + bloques
+    tipo circuito/flecha).
+  -->
+  <defs>
+    <clipPath id="circleClip">
+      <circle cx="256" cy="256" r="220"/>
+    </clipPath>
+  </defs>
+
+  <!-- Outer ring (papaya) -->
+  <circle cx="256" cy="256" r="240" fill="#FF6A13"/>
+  <!-- Inner disc (carbon black) -->
+  <circle cx="256" cy="256" r="222" fill="#141414"/>
+  <!-- Thin inner papaya ring accent -->
+  <circle cx="256" cy="256" r="196" fill="none" stroke="#FF6A13" stroke-width="4"/>
+
+  <g clip-path="url(#circleClip)">
+    <!-- Audio waveform / pulse (EKG-style), stroke in papaya -->
+    <path d="M 90 256
+             L 150 256
+             L 172 190
+             L 196 320
+             L 222 150
+             L 248 340
+             L 270 256
+             L 300 256"
+          fill="none" stroke="#FF6A13" stroke-width="16"
+          stroke-linecap="round" stroke-linejoin="round"/>
+
+    <!-- Arrow / circuit head connecting from the waveform -->
+    <path d="M 300 256 L 340 226 L 340 286 Z" fill="#FF6A13"/>
+
+    <!-- Pixel / circuit blocks (top, middle, bottom) -->
+    <rect x="360" y="200" width="34" height="34" fill="#FF6A13"/>
+    <rect x="360" y="239" width="34" height="34" fill="#FF6A13"/>
+    <rect x="360" y="278" width="34" height="34" fill="#FF6A13"/>
+    <rect x="404" y="239" width="34" height="34" fill="#FF6A13"/>
+  </g>
+</svg>
