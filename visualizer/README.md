@@ -21,9 +21,13 @@ El visualizer soporta **dos logos** que se alternan automáticamente cada 5
 minutos en loop mientras el audio se reproduce:
 
 - **Logo A** (principal): `../assets/logo/logo.png` — el logo del canal.
-- **Logo B** (secundario): `../assets/logo/logo-dj.png` — pensado para un
-  logo de DJ personal. Para activarlo, simplemente colocá el archivo con
-  ese nombre exacto en `assets/logo/`.
+- **Logo B** (secundario): `../assets/logo/logo-dj.png` — el logo de DJ
+  personal (ej. "DJ Danilo Gonzalez"). Ya integrado y verificado.
+
+El contenedor del logo (`#logoLabel`) usa `object-fit: contain`, así que
+acepta logos con **cualquier proporción** (cuadrados como el del canal, o
+anchos/rectangulares como el de DJ) sin deformarlos — cada imagen se ajusta
+manteniendo su relación de aspecto original dentro del mismo espacio.
 
 Ambos logos:
 - **Pulsan/laten sutilmente al ritmo del bajo/kick** en todo momento.
