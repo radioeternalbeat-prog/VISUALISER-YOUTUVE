@@ -11,4 +11,8 @@ __pycache__/
 # pero podés descomentar estas líneas si preferís no subir binarios grandes)
 # assets/backgrounds/*.mp4
 # assets/backgrounds/*.mov
-# output/*.mp4
+
+# Videos e imágenes de prueba/preview generados durante el desarrollo
+# (renders finales que sí quieras compartir, subilos manualmente o quitá esta regla)
+output/*.mp4
+output/real_song_*.png
