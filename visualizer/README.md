@@ -15,33 +15,62 @@ circular (estilo McLaren) que reacciona al bajo/kick de tu mezcla de Progressive
    - Configurá OBS a 1920x1080, 30fps, y grabá "Captura de Pantalla" o "Captura de Ventana".
    - Esto te da el archivo de video final con el visualizer ya sincronizado al audio.
 
-## Logo
+## Logo(s) y alternancia cada 5 minutos
 
-El logo real del canal (`../assets/logo/logo.png`) ya está integrado en el centro
-del tacómetro y **pulsa/vibra sutilmente al ritmo del bajo/kick** (efecto descrito
-en la ficha técnica original). Si el archivo no se encuentra, cae automáticamente
-en un texto de respaldo ("ETERNAL BEAT / MEDIOS") para que el visualizer nunca se
-rompa visualmente.
+El visualizer soporta **dos logos** que se alternan automáticamente cada 5
+minutos en loop mientras el audio se reproduce:
 
-⚠️ **Importante sobre cómo abrir el archivo**: el logo se carga con una ruta
-relativa (`../assets/logo/logo.png`). Esto funciona perfecto si abrís `index.html`
-directamente por doble clic (protocolo `file://`) o si servís *toda la carpeta del
-repositorio* con un servidor local. Si servís solo la carpeta `visualizer/` de forma
-aislada, esa ruta relativa no va a encontrar la imagen y verás el texto de respaldo.
+- **Logo A** (principal): `../assets/logo/logo.png` — el logo del canal.
+- **Logo B** (secundario): `../assets/logo/logo-dj.png` — pensado para un
+  logo de DJ personal. Para activarlo, simplemente colocá el archivo con
+  ese nombre exacto en `assets/logo/`.
 
-Para reemplazar el logo por una versión nueva, simplemente sobrescribí
-`assets/logo/logo.png` (mismo nombre de archivo) o cambiá la ruta en el atributo
-`src` del `<img id="logoImg">` dentro de `index.html`.
+Ambos logos:
+- **Pulsan/laten sutilmente al ritmo del bajo/kick** en todo momento.
+- Al momento de alternar entre uno y otro, se genera un **"latido" extra**
+  (doble pulso rápido) además del fade cruzado entre imágenes.
+- Tienen un **aura de energía** detrás (canvas `#logoAura`) que se mimetiza
+  con los mismos colores RGB del ecualizador circular (ver sección de abajo).
+
+Si `logo-dj.png` no existe, el visualizer detecta el error de carga
+automáticamente y **no alterna** — se queda mostrando solo el logo A sin
+romperse visualmente. Si ninguno de los dos logos carga, cae en un texto de
+respaldo ("ETERNAL BEAT / MEDIOS").
+
+⚠️ **Importante sobre cómo abrir el archivo**: los logos se cargan con rutas
+relativas (`../assets/logo/...`). Esto funciona perfecto si abrís `index.html`
+directamente por doble clic (protocolo `file://`) o si servís *toda la carpeta
+del repositorio* con un servidor local. Si servís solo la carpeta `visualizer/`
+de forma aislada, esas rutas relativas no van a encontrar las imágenes.
+
+## Colores RGB estilo waveform de DJ (Traktor / Serato / Rekordbox)
+
+El ecualizador circular y el arco del tacómetro ya no usan un solo color —
+cada barra se colorea según su banda de frecuencia, con la convención
+estándar de las formas de onda de reproductores de DJ:
+
+- 🔴 **Rojo** = graves (bass/kick)
+- 🟢 **Verde** = medios (voces, melodías, la mayoría de los instrumentos)
+- 🔵 **Azul** = agudos (hi-hats, platillos, brillos)
+
+Esto se calcula en la función `freqToColor(t)` — interpola entre rojo, verde
+y azul según la posición de cada barra en el espectro de frecuencias.
 
 ## Personalización rápida
 
 Abrí `index.html` con un editor de texto y buscá estas partes:
 
-- **Colores**: constantes `PAPAYA`, `PAPAYA_BRIGHT`, `STEEL` cerca de la línea 190.
+- **Colores RGB**: constantes `RGB_BASS`, `RGB_MID`, `RGB_TREBLE` (arrays `[R,G,B]`)
+  cerca de la sección "Paleta RGB estilo waveform de DJ".
+- **Colores de marca**: constantes `PAPAYA`, `PAPAYA_BRIGHT`, `STEEL`.
 - **Tamaño del logo**: `width:150px; height:150px;` en el selector `#logoLabel`.
-- **Intensidad del pulso del logo**: en la función `draw()`, la línea
+- **Intervalo de alternancia entre logos**: constante `LOGO_SWITCH_INTERVAL_MS`
+  (por defecto `5 * 60 * 1000` = 5 minutos).
+- **Intensidad del pulso/latido del logo**: en la función `draw()`, la línea
   `const logoScale = 1 + bassSmooth * 0.18 + ...` — subí el `0.18` si querés que
-  vibre más fuerte.
+  vibre más fuerte, o el `heartbeatPulse * 0.15` para el latido del cambio de logo.
+- **Intensidad del aura**: función `drawLogoAura()` — ajustá los valores de
+  `radiusMul` y la opacidad en `rgbToCss(band.color, 0.35 + ...)`.
 - **Sensibilidad al bajo**: variable `bassBins` (cuántas frecuencias bajas se usan) y el
   multiplicador `* 1.4` / `* 1.3` en el cálculo del "RPM" — subilo si querés que reaccione más fuerte.
 

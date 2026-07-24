@@ -3,15 +3,19 @@
 Script en Python que usa **FFmpeg** para generar el video final combinando:
 - Tu audio (la mezcla del DJ set)
 - Un fondo en loop (video o imagen: carretera, túnel, etc.)
-- Un ecualizador/espectro reactivo generado automáticamente desde el audio
-  (coloreado en la paleta de marca)
-- Tu logo centrado (opcional)
+- Un ecualizador/espectro reactivo generado automáticamente desde el audio,
+  coloreado en **RGB estilo waveform de DJ** (Traktor/Serato/Rekordbox):
+  rojo = graves, verde = medios, azul = agudos
+- Tu logo centrado (opcional), con un "latido" sutil sincronizado
+- Un segundo logo opcional que se alterna con el primero cada 5 minutos
+  en loop durante todo el video (`--logo-b`)
 - El marco estilo "fibra de carbono" con línea Naranja Papaya
 - Un título de texto superpuesto (opcional)
 
 Este script **fue probado end-to-end** en este entorno con archivos de prueba
-(audio, video de fondo e imagen de fondo) y generó correctamente video MP4
-1920x1080 a 30fps con audio AAC.
+y con una canción real, y generó correctamente video MP4 1920x1080 a 30fps
+con audio AAC, con los 3 colores del espectro verificados visualmente
+(rojo/verde/azul sólidos, sin mezclas raras de color).
 
 ## Requisitos
 
@@ -59,6 +63,22 @@ python3 render.py \
   --output "../output/sesion01_final.mp4"
 ```
 
+### 3. Con dos logos alternados cada 5 minutos (opcional)
+
+Si tenés dos logos (por ejemplo, el logo del canal y un logo de DJ personal),
+podés hacer que se alternen automáticamente cada 5 minutos durante todo el
+video, con el mismo efecto de "latido":
+
+```bash
+python3 render.py \
+  --audio "ruta/a/tu_mezcla.mp3" \
+  --background "ruta/a/tu_fondo.mp4" \
+  --logo "ruta/a/logo_canal.png" \
+  --logo-b "ruta/a/logo_dj.png" \
+  --title "Sesion 01" \
+  --output "../output/sesion01_final.mp4"
+```
+
 ⚠️ Un render de 1-2 horas en calidad completa puede tardar bastante
 (dependiendo de tu CPU, entre 20 minutos y varias horas). Corré la
 previsualización primero para no perder tiempo si algo está mal configurado.
@@ -70,6 +90,7 @@ previsualización primero para no perder tiempo si algo está mal configurado.
 | `--audio`          | Sí          | Ruta al archivo de audio (mp3/wav) de tu mezcla.                         |
 | `--background`     | Sí          | Ruta a un video (mp4) o imagen (png/jpg) de fondo. Se repite en loop.    |
 | `--logo`           | No          | Ruta a un PNG con transparencia, se centra en pantalla.                 |
+| `--logo-b`         | No          | Ruta a un segundo logo. Requiere `--logo`. Se alterna con el logo principal cada 5 minutos en loop. |
 | `--title`          | No          | Texto a mostrar en la esquina inferior izquierda.                       |
 | `--output`         | Sí          | Ruta del archivo MP4 final.                                              |
 | `--test-seconds`   | No          | Renderiza solo los primeros N segundos (para previsualizar).            |
@@ -82,8 +103,20 @@ previsualización primero para no perder tiempo si algo está mal configurado.
   corto de 10-30 segundos de carretera/túnel y se repetirá durante toda la mezcla.
 - **El espectro reactivo** se genera con el filtro `showcqt` de FFmpeg, que
   analiza el audio real (no es un efecto genérico) — reacciona a los bajos,
-  kicks y a la energía general de la mezcla, tal como se buscaba con el
-  concepto de "tacómetro".
+  kicks y a la energía general de la mezcla. Internamente, el audio se separa
+  en 3 bandas (graves/medios/agudos) con filtros `lowpass`/`bandpass`/`highpass`,
+  cada banda genera su propio espectro coloreado sólido (rojo/verde/azul), y
+  se combinan con mezcla aditiva en espacio RGB — así cada color aparece solo
+  donde hay energía real en esa banda, igual que el waveform de un reproductor
+  DJ (Traktor, Serato, Rekordbox).
+- **El "latido" del logo** es un zoom sinusoidal sutil (`scale` con `eval=frame`)
+  con un ciclo de ~1.2 segundos, para simular el pulso audio-reactivo del
+  visualizer JS (FFmpeg no puede leer el nivel de bajo en tiempo real tan
+  fácilmente como JavaScript, así que se usa un pulso periódico consistente).
+- **La alternancia de dos logos** (`--logo-b`) usa la opción `enable` de
+  `overlay` con una expresión `mod(t, 600)` para mostrar el logo A los
+  primeros 5 minutos de cada ciclo de 10 minutos, y el logo B los siguientes
+  5 — repitiéndose en loop durante toda la duración del video.
 - Si no tenés un logo aún, simplemente omití `--logo` y el video se genera igual
   (sin logo centrado). El marco de fibra de carbono y el espectro se ven de todas formas.
 - Si querés el efecto exacto del **visualizer circular tipo tacómetro** (con aguja,

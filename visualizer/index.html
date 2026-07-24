@@ -46,6 +46,16 @@
     pointer-events:none;
     opacity:0.9;
   }
+  /* Canvas del "aura" de energia detras del logo (mimetizado con el espectro RGB) */
+  #logoAura{
+    position:absolute;
+    top:50%; left:50%;
+    width:340px; height:340px;
+    transform:translate(-50%,-50%);
+    pointer-events:none;
+    z-index:4;
+    mix-blend-mode: screen;
+  }
   #logoLabel{
     position:absolute;
     top:50%; left:50%;
@@ -53,15 +63,20 @@
     transform:translate(-50%,-50%) scale(1);
     pointer-events:none;
     z-index:5;
-    filter: drop-shadow(0 0 18px rgba(255,106,19,0.55));
+    filter: drop-shadow(0 0 10px rgba(0,0,0,0.4));
     transition: filter 0.1s ease-out;
     will-change: transform, filter;
   }
-  #logoLabel img{
+  #logoLabel .logo-img{
     display:block;
     width:100%; height:100%;
+    position:absolute; top:0; left:0;
+    opacity:1;
+    transition: opacity 0.8s ease-in-out;
   }
-  /* Fallback text logo (used only if assets/logo/logo.png fails to load) */
+  #logoLabel .logo-img.hidden{ opacity:0; }
+  #logoLabel .logo-img.broken{ display:none; }
+  /* Fallback text logo (usado solo si NINGUNA de las dos imagenes carga) */
   #logoLabel .fallbackText{
     display:none;
     text-align:center;
@@ -70,6 +85,8 @@
     font-weight:800;
     letter-spacing:4px;
     font-size:34px;
+    position:absolute; top:50%; left:50%; transform:translate(-50%,-50%);
+    width:220px;
   }
   #logoLabel .fallbackText small{
     display:block;
@@ -79,8 +96,7 @@
     margin-top:6px;
     text-shadow:0 0 12px rgba(255,106,19,0.8);
   }
-  #logoLabel img.broken{ display:none; }
-  #logoLabel img.broken + .fallbackText{ display:block; }
+  #logoLabel.both-broken .fallbackText{ display:block; }
   #controls{
     position:fixed; bottom:0; left:0; right:0;
     background:rgba(10,10,13,0.92);
@@ -119,8 +135,11 @@
     <video id="bgVideo" loop muted playsinline></video>
     <div class="carbon-frame"></div>
     <canvas id="viz" width="1920" height="1080"></canvas>
+    <canvas id="logoAura" width="340" height="340"></canvas>
     <div id="logoLabel">
-      <img id="logoImg" src="../assets/logo/logo.png" alt="Eternal Beat Medios"
+      <img id="logoImgA" class="logo-img" src="../assets/logo/logo.png" alt="Eternal Beat Medios"
+           onerror="this.classList.add('broken')">
+      <img id="logoImgB" class="logo-img hidden" src="../assets/logo/logo-dj.png" alt="Eternal Beat Medios DJ"
            onerror="this.classList.add('broken')">
       <div class="fallbackText">ETERNAL BEAT<small>MEDIOS</small></div>
     </div>
@@ -153,6 +172,54 @@ const ctx = canvas.getContext('2d');
 const stage = document.getElementById('stage');
 const zoomWrap = document.getElementById('zoomWrap');
 const logoLabelEl = document.getElementById('logoLabel');
+const logoImgA = document.getElementById('logoImgA');
+const logoImgB = document.getElementById('logoImgB');
+const auraCanvas = document.getElementById('logoAura');
+const auraCtx = auraCanvas.getContext('2d');
+
+// ---- Logo alternation (cada 5 min, con fade + "latido") ----
+const LOGO_SWITCH_INTERVAL_MS = 5 * 60 * 1000; // 5 minutos
+let currentLogo = 'A'; // 'A' = logo principal, 'B' = logo DJ
+let logoSwitchTimer = null;
+
+function checkLogoBroken(img){
+  img.addEventListener('error', () => img.classList.add('broken'));
+}
+checkLogoBroken(logoImgA);
+checkLogoBroken(logoImgB);
+
+function updateBothBrokenState(){
+  if(logoImgA.classList.contains('broken') && logoImgB.classList.contains('broken')){
+    logoLabelEl.classList.add('both-broken');
+  }
+}
+logoImgA.addEventListener('error', updateBothBrokenState);
+logoImgB.addEventListener('error', updateBothBrokenState);
+
+function switchLogo(){
+  // Si el logo destino esta roto (no cargo), no alternamos, nos quedamos con el que funciona
+  const goingToB = currentLogo === 'A';
+  if(goingToB && logoImgB.classList.contains('broken')) return;
+  if(!goingToB && logoImgA.classList.contains('broken')) return;
+
+  currentLogo = goingToB ? 'B' : 'A';
+  logoImgA.classList.toggle('hidden', goingToB);
+  logoImgB.classList.toggle('hidden', !goingToB);
+
+  // "Latido" extra fuerte en el instante del cambio (doble pulso rapido)
+  triggerHeartbeatBurst();
+}
+
+function startLogoAlternation(){
+  if(logoSwitchTimer) clearInterval(logoSwitchTimer);
+  logoSwitchTimer = setInterval(switchLogo, LOGO_SWITCH_INTERVAL_MS);
+}
+
+// Pulso de "latido" manual (doble beat rápido) al momento del cambio de logo
+let heartbeatBurstUntil = 0;
+function triggerHeartbeatBurst(){
+  heartbeatBurstUntil = performance.now() + 900; // 900ms de burst extra
+}
 
 let audioCtx, analyser, sourceNode, dataArray, bufferLength;
 let audioEl = new Audio();
@@ -206,6 +273,7 @@ playBtn.addEventListener('click', async () => {
     audioEl.play();
     bgVideo.play().catch(()=>{});
     playBtn.textContent = '⏸ PAUSE';
+    startLogoAlternation();
     requestAnimationFrame(draw);
   } else {
     audioEl.pause();
@@ -224,6 +292,25 @@ const PAPAYA_BRIGHT = '#FF8A3D';
 const STEEL = '#C9CDD3';
 const CARBON = '#0a0a0d';
 
+// ---- Paleta RGB estilo waveform de DJ (Traktor / Serato / Rekordbox) ----
+// Convencion estandar: graves = rojo, medios = verde/amarillo, agudos = azul
+const RGB_BASS   = [255, 40,  60];   // rojo
+const RGB_MID    = [60,  255, 90];   // verde
+const RGB_TREBLE = [40,  140, 255];  // azul
+
+function lerp(a, b, t){ return a + (b - a) * t; }
+function rgbLerp(c1, c2, t){
+  return [lerp(c1[0],c2[0],t), lerp(c1[1],c2[1],t), lerp(c1[2],c2[2],t)];
+}
+// Devuelve un color RGB interpolado segun la posicion de frecuencia (0=graves, 1=agudos)
+function freqToColor(t){
+  if(t < 0.5) return rgbLerp(RGB_BASS, RGB_MID, t / 0.5);
+  return rgbLerp(RGB_MID, RGB_TREBLE, (t - 0.5) / 0.5);
+}
+function rgbToCss(c, alpha){
+  return `rgba(${Math.round(c[0])},${Math.round(c[1])},${Math.round(c[2])},${alpha})`;
+}
+
 const CX = 960, CY = 540; // center of 1920x1080 canvas
 const BASE_RADIUS = 220;
 const MAX_RADIUS_EXTRA = 140;
@@ -231,6 +318,8 @@ const BAR_COUNT = 64;
 
 let smoothLevels = new Array(BAR_COUNT).fill(0);
 let bassSmooth = 0;
+let midSmooth = 0;
+let trebleSmooth = 0;
 let pulse = 0;
 
 function draw(){
@@ -249,6 +338,27 @@ function draw(){
 
   pulse += (bassLevel > 0.55 ? 1 : 0 - pulse*0.1);
   pulse *= 0.9;
+
+  // ---- Niveles RGB por banda (graves/medios/agudos) para el aura y el espectro ----
+  const midStart = Math.floor(bufferLength * 0.08);
+  const midEnd = Math.floor(bufferLength * 0.35);
+  const trebleStart = midEnd;
+  const trebleEnd = Math.floor(bufferLength * 0.85);
+
+  let midSum = 0;
+  for(let i=midStart;i<midEnd;i++) midSum += dataArray[i];
+  const midLevel = midEnd > midStart ? (midSum/(midEnd-midStart))/255 : 0;
+  midSmooth += (midLevel - midSmooth) * 0.25;
+
+  let trebleSum = 0;
+  for(let i=trebleStart;i<trebleEnd;i++) trebleSum += dataArray[i];
+  const trebleLevel = trebleEnd > trebleStart ? (trebleSum/(trebleEnd-trebleStart))/255 : 0;
+  trebleSmooth += (trebleLevel - trebleSmooth) * 0.25;
+
+  // Burst manual de "latido" al cambiar de logo (se suma temporalmente a la escala)
+  const heartbeatActive = performance.now() < heartbeatBurstUntil;
+  const heartbeatT = heartbeatActive ? (heartbeatBurstUntil - performance.now())/900 : 0;
+  const heartbeatPulse = heartbeatActive ? Math.sin(heartbeatT * Math.PI * 4) * heartbeatT : 0;
 
   // ---- Outer glow ring reacts to bass (the "RPM zone") ----
   const rpmZoneActive = bassSmooth > 0.6;
@@ -285,17 +395,18 @@ function draw(){
   const avgEnergy = (totalEnergy / bufferLength) / 255;
 
   const activeSweep = sweep * Math.min(1, avgEnergy * 1.4 + bassSmooth*0.3);
+  // Gradiente RGB estilo waveform de DJ: rojo (graves) -> verde (medios) -> azul (agudos)
   const arcGrad = ctx.createLinearGradient(-BASE_RADIUS, 0, BASE_RADIUS, 0);
-  arcGrad.addColorStop(0, STEEL);
-  arcGrad.addColorStop(0.7, PAPAYA);
-  arcGrad.addColorStop(1, PAPAYA_BRIGHT);
+  arcGrad.addColorStop(0,   rgbToCss(RGB_BASS, 1));
+  arcGrad.addColorStop(0.5, rgbToCss(RGB_MID, 1));
+  arcGrad.addColorStop(1,   rgbToCss(RGB_TREBLE, 1));
 
   ctx.beginPath();
   ctx.arc(0,0, BASE_RADIUS, startAngle, startAngle + activeSweep);
   ctx.strokeStyle = arcGrad;
   ctx.lineWidth = 26;
   ctx.lineCap = 'round';
-  ctx.shadowColor = rpmZoneActive ? PAPAYA : STEEL;
+  ctx.shadowColor = rgbToCss(RGB_MID, 1);
   ctx.shadowBlur = 30;
   ctx.stroke();
   ctx.shadowBlur = 0;
@@ -307,9 +418,10 @@ function draw(){
   ctx.lineWidth = 8;
   ctx.stroke();
 
-  // ---- Circular equalizer bars around the ring ----
+  // ---- Circular equalizer bars around the ring (coloreado RGB por frecuencia, estilo DJ waveform) ----
   for(let i=0;i<BAR_COUNT;i++){
-    const dataIndex = Math.floor((i / BAR_COUNT) * bufferLength * 0.5);
+    const freqT = i / BAR_COUNT; // 0 = graves, 1 = agudos
+    const dataIndex = Math.floor(freqT * bufferLength * 0.5);
     const raw = dataArray[dataIndex] / 255;
     smoothLevels[i] += (raw - smoothLevels[i]) * 0.35;
 
@@ -323,15 +435,17 @@ function draw(){
     const x2 = Math.cos(angle) * rOuter;
     const y2 = Math.sin(angle) * rOuter;
 
+    const barColor = freqToColor(freqT);
     ctx.beginPath();
     ctx.moveTo(x1,y1);
     ctx.lineTo(x2,y2);
-    ctx.strokeStyle = smoothLevels[i] > 0.7 ? PAPAYA_BRIGHT : STEEL;
+    ctx.strokeStyle = rgbToCss(barColor, smoothLevels[i] > 0.7 ? 1 : 0.8);
     ctx.lineWidth = 6;
     ctx.lineCap = 'round';
-    ctx.globalAlpha = 0.85;
+    ctx.shadowColor = rgbToCss(barColor, 0.9);
+    ctx.shadowBlur = smoothLevels[i] > 0.6 ? 10 : 0;
     ctx.stroke();
-    ctx.globalAlpha = 1;
+    ctx.shadowBlur = 0;
   }
 
   // ---- Needle (kick-reactive) ----
@@ -363,11 +477,41 @@ function draw(){
   // ---- Speed lines overlay (simple procedural, works without bg video) ----
   drawSpeedLines(avgEnergy);
 
-  // ---- Logo pulse (vibra sutilmente con el bajo/kick) ----
-  const logoScale = 1 + bassSmooth * 0.18 + (rpmZoneActive ? 0.05 : 0);
-  const logoGlow = 12 + bassSmooth * 40;
+  // ---- Logo pulse ("latido" al ritmo del bajo/kick + burst extra al cambiar de logo) ----
+  const logoScale = 1 + bassSmooth * 0.18 + (rpmZoneActive ? 0.05 : 0) + heartbeatPulse * 0.15;
   logoLabelEl.style.transform = `translate(-50%,-50%) scale(${logoScale.toFixed(3)})`;
-  logoLabelEl.style.filter = `drop-shadow(0 0 ${logoGlow.toFixed(0)}px rgba(255,106,19,${(0.4 + bassSmooth*0.5).toFixed(2)}))`;
+
+  // ---- Aura de energia alrededor del logo, mimetizada con los colores RGB del espectro ----
+  drawLogoAura(bassSmooth, midSmooth, trebleSmooth, heartbeatPulse);
+}
+
+// Dibuja el aura circular de energia detras del logo, usando la misma paleta
+// RGB (rojo=graves, verde=medios, azul=agudos) que el ecualizador, para que
+// el logo se sienta "mimetizado" con el espectro.
+function drawLogoAura(bass, mid, treble, heartbeatPulse){
+  const size = 340;
+  auraCtx.clearRect(0,0,size,size);
+  const cx = size/2, cy = size/2;
+
+  const bands = [
+    {level: bass,   color: RGB_BASS,   radiusMul: 0.62},
+    {level: mid,    color: RGB_MID,    radiusMul: 0.78},
+    {level: treble, color: RGB_TREBLE, radiusMul: 0.95},
+  ];
+
+  auraCtx.save();
+  auraCtx.globalCompositeOperation = 'lighter';
+  for(const band of bands){
+    const r = (size/2) * band.radiusMul * (0.6 + band.level*0.6 + heartbeatPulse*0.25);
+    const grad = auraCtx.createRadialGradient(cx,cy, r*0.15, cx,cy, r);
+    grad.addColorStop(0, rgbToCss(band.color, 0.35 + band.level*0.35));
+    grad.addColorStop(1, rgbToCss(band.color, 0));
+    auraCtx.fillStyle = grad;
+    auraCtx.beginPath();
+    auraCtx.arc(cx,cy, r, 0, Math.PI*2);
+    auraCtx.fill();
+  }
+  auraCtx.restore();
 }
 
 // Procedural speed-line streaks (used as fallback / overlay even with bg video)
@@ -396,10 +540,11 @@ function drawSpeedLines(energy){
   ctx.restore();
 }
 
-// initial idle render loop (so canvas isn't blank before play)
+// initial idle render loop (so canvas isn't blank before play, and aura shows a subtle base glow)
 function idleRender(){
   ctx.clearRect(0,0,1920,1080);
   drawSpeedLines(0.1);
+  drawLogoAura(0.15, 0.12, 0.10, 0);
   if(!audioCtx || audioEl.paused) requestAnimationFrame(idleRender);
 }
 idleRender();

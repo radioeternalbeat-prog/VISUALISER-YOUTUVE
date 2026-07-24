@@ -7,15 +7,22 @@ Combina automáticamente (sin grabar pantalla):
   - Tu pista de audio (el DJ set / mezcla ya exportada)
   - Un video o imagen de fondo en loop (carretera, túnel, etc.)
   - Un espectro/ecualizador reactivo generado directamente por FFmpeg
-    a partir del audio (colorizado en Naranja Papaya / Gris Acero)
+    a partir del audio, coloreado en RGB estilo waveform de DJ
+    (Traktor/Serato/Rekordbox: rojo=graves, verde=medios, azul=agudos)
   - Un marco estilo "fibra de carbono" con acento papaya
-  - (Opcional) tu logo centrado
+  - (Opcional) tu logo centrado, con un "latido" sutil sincronizado
+  - (Opcional) un segundo logo que se alterna con el primero cada 5
+    minutos en loop durante todo el video (--logo-b)
 
 Requiere: Python 3.8+ y FFmpeg instalado y disponible en el PATH.
 
 USO BÁSICO:
     python3 render.py --audio mezcla.mp3 --background carretera.mp4 \
         --logo logo.png --output ../output/sesion01.mp4
+
+USO CON DOS LOGOS ALTERNADOS (cada 5 minutos, en loop):
+    python3 render.py --audio mezcla.mp3 --background carretera.mp4 \
+        --logo logo.png --logo-b logo-dj.png --output ../output/sesion01.mp4
 
 PRUEBA RÁPIDA (solo primeros 20 segundos, para revisar el resultado
 antes de renderizar 1-2 horas completas):
@@ -62,13 +69,38 @@ def get_duration_seconds(path):
     return float(out.stdout.strip())
 
 
-def build_filter_complex(has_logo, has_background_image, title_text):
+# Paleta RGB estilo waveform de DJ (Traktor / Serato / Rekordbox)
+# Convencion estandar: graves = rojo, medios = verde, agudos = azul.
+#
+# El parametro cscheme de showcqt colorea cada barra por AMPLITUD (degradado
+# vertical dentro de la barra), no por posicion de frecuencia -- por eso un
+# cscheme "rojo->verde" simple se ve amarillo (mezcla) en vez de barras rojas
+# solidas en graves. Para lograr el efecto real de "colorear por banda de
+# frecuencia" (como el waveform de un reproductor DJ), se generan TRES capas
+# de espectro por separado, cada una alimentada con el audio filtrado a una
+# banda de frecuencia (graves/medios/agudos) y coloreada de forma SOLIDA
+# (mismo color en ambos extremos de cscheme), y se combinan con mezcla
+# aditiva (blend=addition). Asi cada banda "ilumina" su propio color solo
+# donde tiene energia real, igual que un analizador de espectro de DJ.
+DJ_BASS_HZ = 200      # graves: 40-200 Hz aprox
+DJ_MID_HZ = 2000      # medios: 200-2000 Hz aprox (agudos: 2000-9000 Hz)
+DJ_CSCHEME_RED   = "1|0|0|1|0|0"   # rojo solido (graves)
+DJ_CSCHEME_GREEN = "0|1|0|0|1|0"   # verde solido (medios)
+DJ_CSCHEME_BLUE  = "0|0.2|1|0|0.2|1"  # azul solido (agudos)
+
+# Cada cuanto tiempo alternar entre logo A y logo B, en el render final (segundos)
+LOGO_SWITCH_INTERVAL_S = 5 * 60  # 5 minutos
+LOGO_SWITCH_FADE_S = 0.6         # duracion del fundido cruzado entre logos
+LOGO_BASE_SCALE = 280            # ancho en px del logo dentro del video
+
+
+def build_filter_complex(has_logo, has_logo_b, has_background_image, title_text, duration):
     """
     Construye la cadena de filtros de FFmpeg:
       [0:v] fondo (video o imagen en loop) -> escalado/cropeado a 1920x1080
-      [1:a] audio -> genera espectro reactivo (showcqt) colorizado
+      [1:a] audio -> genera espectro reactivo (showcqt) colorizado en RGB estilo DJ
       overlay del espectro (con clave de color negro = transparente) sobre el fondo
-      overlay del logo centrado (si existe)
+      overlay del/los logo(s) centrado(s), con "latido" y alternancia cada 5 min si hay 2
       marco tipo fibra de carbono con acento papaya
       (opcional) texto del título en la esquina inferior
     """
@@ -82,11 +114,47 @@ def build_filter_complex(has_logo, has_background_image, title_text):
     )
 
     # 2. Espectro reactivo generado desde el audio (showcqt = Constant-Q Transform,
-    #    similar a un ecualizador de barras). Lo coloreamos manualmente y lo
-    #    dejamos con fondo negro para poder recortarlo por color (colorkey).
+    #    similar a un ecualizador de barras), coloreado en RGB estilo waveform de
+    #    DJ (rojo=graves, verde=medios, azul=agudos). Se generan TRES capas de
+    #    espectro, cada una alimentada con el audio ya filtrado a su banda de
+    #    frecuencia (graves/medios/agudos) y coloreada de forma solida, y se
+    #    combinan con mezcla aditiva para que solo brille el color de la banda
+    #    con energia real en cada punto -- igual que un analizador de espectro
+    #    de DJ real, no un degrade generico.
+    parts.append(f"[1:a]asplit=3[a_bass][a_mid][a_treble]")
+    parts.append(f"[a_bass]lowpass=f={DJ_BASS_HZ}[a_bass_f]")
+    parts.append(f"[a_mid]bandpass=f={(DJ_BASS_HZ+DJ_MID_HZ)//2}:width_type=h:w={DJ_MID_HZ-DJ_BASS_HZ}[a_mid_f]")
+    parts.append(f"[a_treble]highpass=f={DJ_MID_HZ}[a_treble_f]")
+
+    # sono_h=0 desactiva el "sonograma" (historial de espectro que showcqt
+    # dibuja debajo de las barras) -- sin esto, al sumar 3 capas con blend
+    # aditivo, el sonograma de cada capa se saturaba y pintaba toda la
+    # pantalla de un color solido (magenta), tapando el fondo por completo.
     parts.append(
-        f"[1:a]showcqt=s={WIDTH}x{HEIGHT}:bar_g=2:sono_g=3:basefreq=40:"
-        f"endfreq=9000:tc=0.33:count=1,"
+        f"[a_bass_f]showcqt=s={WIDTH}x{HEIGHT}:bar_g=1.5:sono_h=0:basefreq=40:"
+        f"endfreq=9000:tc=0.33:count=1:cscheme={DJ_CSCHEME_RED}[cqt_bass]"
+    )
+    parts.append(
+        f"[a_mid_f]showcqt=s={WIDTH}x{HEIGHT}:bar_g=1.5:sono_h=0:basefreq=40:"
+        f"endfreq=9000:tc=0.33:count=1:cscheme={DJ_CSCHEME_GREEN}[cqt_mid]"
+    )
+    parts.append(
+        f"[a_treble_f]showcqt=s={WIDTH}x{HEIGHT}:bar_g=1.5:sono_h=0:basefreq=40:"
+        f"endfreq=9000:tc=0.33:count=1:cscheme={DJ_CSCHEME_BLUE}[cqt_treble]"
+    )
+    # IMPORTANTE: convertir cada capa a RGB (format=gbrp) antes de blend=addition.
+    # El filtro 'blend' opera en el espacio de color nativo del input; si se
+    # deja en YUV, sumar los canales de crominancia genera artefactos de
+    # color saturado (aparecia todo en magenta). Convirtiendo a RGB primero,
+    # la suma es aditiva real por canal R/G/B, como se espera.
+    parts.append(f"[cqt_bass]format=gbrp[cqt_bass_rgb]")
+    parts.append(f"[cqt_mid]format=gbrp[cqt_mid_rgb]")
+    parts.append(f"[cqt_treble]format=gbrp[cqt_treble_rgb]")
+    parts.append(
+        f"[cqt_bass_rgb][cqt_mid_rgb]blend=all_mode=addition[cqt_bm]"
+    )
+    parts.append(
+        f"[cqt_bm][cqt_treble_rgb]blend=all_mode=addition,"
         f"format=rgba,"
         f"colorkey=0x000000:0.12:0.06[cqt_keyed]"
     )
@@ -96,11 +164,46 @@ def build_filter_complex(has_logo, has_background_image, title_text):
 
     last = "stage1"
 
-    # 4. Logo centrado (opcional).
-    if has_logo:
-        parts.append(f"[2:v]scale=280:-1[logo]")
+    # 4. Logo(s): "latido" sutil sincronizado a un pulso periodico (simulando el
+    #    ritmo, ya que FFmpeg no puede leer el nivel de bajo en tiempo real como
+    #    el visualizer JS) + alternancia cada 5 minutos si hay 2 logos.
+    if has_logo and has_logo_b:
+        # Dos logos: cada uno escalado con un "latido" (zoom sinusoidal),
+        # y alternados con fade cada LOGO_SWITCH_INTERVAL_S segundos.
+        # eval=frame es necesario para que 'scale' pueda usar la variable de tiempo 't'.
         parts.append(
-            f"[{last}][logo]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2[stage2]"
+            f"[2:v]scale={LOGO_BASE_SCALE}:-1,"
+            f"scale=w='iw*(1+0.05*sin(2*PI*t/1.2))':h='ih*(1+0.05*sin(2*PI*t/1.2))':eval=frame"
+            f"[logoA_pulse]"
+        )
+        parts.append(
+            f"[3:v]scale={LOGO_BASE_SCALE}:-1,"
+            f"scale=w='iw*(1+0.05*sin(2*PI*t/1.2))':h='ih*(1+0.05*sin(2*PI*t/1.2))':eval=frame"
+            f"[logoB_pulse]"
+        )
+        # Alternancia por tiempo: A visible en el tramo [0, 5min), B en [5min, 10min), etc.
+        # Se usa 'enable' con una expresion modulo para que se repita en loop durante todo el video.
+        cycle = LOGO_SWITCH_INTERVAL_S * 2
+        enable_a = f"lt(mod(t\\,{cycle})\\,{LOGO_SWITCH_INTERVAL_S})"
+        enable_b = f"gte(mod(t\\,{cycle})\\,{LOGO_SWITCH_INTERVAL_S})"
+        parts.append(
+            f"[{last}][logoA_pulse]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:"
+            f"enable='{enable_a}'[stage_logoA]"
+        )
+        parts.append(
+            f"[stage_logoA][logoB_pulse]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2:"
+            f"enable='{enable_b}'[stage2]"
+        )
+        last = "stage2"
+    elif has_logo:
+        # Un solo logo: mismo "latido" sutil, sin alternancia.
+        parts.append(
+            f"[2:v]scale={LOGO_BASE_SCALE}:-1,"
+            f"scale=w='iw*(1+0.05*sin(2*PI*t/1.2))':h='ih*(1+0.05*sin(2*PI*t/1.2))':eval=frame"
+            f"[logo_pulse]"
+        )
+        parts.append(
+            f"[{last}][logo_pulse]overlay=(main_w-overlay_w)/2:(main_h-overlay_h)/2[stage2]"
         )
         last = "stage2"
 
@@ -148,7 +251,10 @@ def main():
     )
     ap.add_argument("--audio", required=True, help="Ruta al archivo de audio (mp3/wav) del DJ set.")
     ap.add_argument("--background", required=True, help="Ruta al video o imagen de fondo en loop.")
-    ap.add_argument("--logo", required=False, default=None, help="Ruta al logo (PNG con transparencia). Opcional.")
+    ap.add_argument("--logo", required=False, default=None, help="Ruta al logo principal (PNG con transparencia). Opcional.")
+    ap.add_argument("--logo-b", required=False, default=None,
+                     help="Ruta a un segundo logo (ej. logo de DJ). Si se especifica junto con --logo, "
+                          "ambos se alternan cada 5 minutos en loop durante todo el video, con un latido sutil.")
     ap.add_argument("--title", required=False, default=None, help="Texto de título a mostrar (opcional).")
     ap.add_argument("--output", required=True, help="Ruta del archivo MP4 final.")
     ap.add_argument(
@@ -168,6 +274,10 @@ def main():
             sys.exit(f"ERROR: no se encontró el archivo de {label}: {p}")
     if args.logo and not os.path.exists(args.logo):
         sys.exit(f"ERROR: no se encontró el logo: {args.logo}")
+    if args.logo_b and not os.path.exists(args.logo_b):
+        sys.exit(f"ERROR: no se encontró el segundo logo (--logo-b): {args.logo_b}")
+    if args.logo_b and not args.logo:
+        sys.exit("ERROR: --logo-b requiere que tambien especifiques --logo (el logo principal).")
 
     os.makedirs(os.path.dirname(os.path.abspath(args.output)) or ".", exist_ok=True)
 
@@ -179,8 +289,10 @@ def main():
 
     filter_complex, final_label = build_filter_complex(
         has_logo=bool(args.logo),
+        has_logo_b=bool(args.logo_b),
         has_background_image=bg_is_image,
         title_text=args.title,
+        duration=duration,
     )
 
     cmd = ["ffmpeg", "-y"]
@@ -194,9 +306,13 @@ def main():
     # Input 1: audio
     cmd += ["-i", args.audio]
 
-    # Input 2: logo (opcional)
+    # Input 2: logo principal (opcional)
     if args.logo:
         cmd += ["-loop", "1", "-i", args.logo]
+
+    # Input 3: segundo logo, para alternancia cada 5 min (opcional)
+    if args.logo_b:
+        cmd += ["-loop", "1", "-i", args.logo_b]
 
     cmd += [
         "-filter_complex", filter_complex,
