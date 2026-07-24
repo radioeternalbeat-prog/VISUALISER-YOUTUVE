@@ -94,7 +94,7 @@ LOGO_SWITCH_FADE_S = 0.6         # duracion del fundido cruzado entre logos
 LOGO_BASE_SCALE = 280            # ancho en px del logo dentro del video
 
 
-def build_filter_complex(has_logo, has_logo_b, has_background_image, title_text, duration):
+def build_filter_complex(has_logo, has_logo_b, has_background_image, title_text, duration, output_scale=None):
     """
     Construye la cadena de filtros de FFmpeg:
       [0:v] fondo (video o imagen en loop) -> escalado/cropeado a 1920x1080
@@ -227,6 +227,13 @@ def build_filter_complex(has_logo, has_logo_b, has_background_image, title_text,
             )
             last = "titled"
 
+    # 7. Downscale final opcional (para previews livianos: menos píxeles a
+    #    codificar = archivo más chico y render más rápido, sin tocar el
+    #    resto de la composición que sigue calculándose en HD).
+    if output_scale:
+        parts.append(f"[{last}]scale={output_scale}[scaled_out]")
+        last = "scaled_out"
+
     filter_complex = ";".join(parts)
     return filter_complex, last
 
@@ -265,6 +272,18 @@ def main():
         "--crf", type=int, default=18,
         help="Calidad de video (menor = mejor calidad, mayor peso). Default 18 (alta calidad)."
     )
+    ap.add_argument(
+        "--audio-bitrate", type=str, default="320k",
+        help="Bitrate del audio de salida (ej. '320k', '128k'). Default 320k."
+    )
+    ap.add_argument(
+        "--output-scale", type=str, default=None,
+        help="Escala de salida final, ej. '1280:720', para generar previews livianos "
+             "(reduce el tamaño de archivo y el tiempo de render, sin afectar la composición interna)."
+    )
+    ap.add_argument("--maxrate", type=str, default="50000k", help="Bitrate máximo de video (limita el peso del archivo).")
+    ap.add_argument("--bufsize", type=str, default="50000k", help="Tamaño de buffer para --maxrate.")
+    ap.add_argument("--fps", type=int, default=30, help="Frames por segundo de salida. Bajalo (ej. 20) para previews más livianos.")
     args = ap.parse_args()
 
     check_ffmpeg()
@@ -293,6 +312,7 @@ def main():
         has_background_image=bg_is_image,
         title_text=args.title,
         duration=duration,
+        output_scale=args.output_scale,
     )
 
     cmd = ["ffmpeg", "-y"]
@@ -319,11 +339,12 @@ def main():
         "-map", f"[{final_label}]",
         "-map", "1:a",
         "-t", str(duration),
-        "-r", "30",
+        "-r", str(args.fps),
         "-c:v", "libx264", "-preset", "medium", "-crf", str(args.crf),
         "-pix_fmt", "yuv420p",
-        "-c:a", "aac", "-b:a", "320k",
+        "-c:a", "aac", "-b:a", args.audio_bitrate,
         "-movflags", "+faststart",
+        "-maxrate", args.maxrate, "-bufsize", args.bufsize,
         args.output,
     ]
 

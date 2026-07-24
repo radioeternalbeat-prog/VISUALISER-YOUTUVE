@@ -95,6 +95,30 @@ previsualización primero para no perder tiempo si algo está mal configurado.
 | `--output`         | Sí          | Ruta del archivo MP4 final.                                              |
 | `--test-seconds`   | No          | Renderiza solo los primeros N segundos (para previsualizar).            |
 | `--crf`            | No          | Calidad de video, 18 por defecto (más bajo = mejor calidad, más pesado).|
+| `--audio-bitrate`  | No          | Bitrate del audio (ej. `320k`, `128k`). Default `320k`.                 |
+| `--output-scale`   | No          | Resolución final, ej. `960:540`. Útil para previews livianos que quepan en GitHub (<100MB). |
+| `--maxrate` / `--bufsize` | No   | Límite de bitrate de video, para acotar el peso del archivo final.      |
+| `--fps`            | No          | Frames por segundo de salida. Default 30. Bajalo (ej. 24) para previews más livianos. |
+
+### Ejemplo: preview largo (~10 min) liviano para compartir
+
+Para generar un preview de varios minutos que pese poco (para subir a GitHub,
+WhatsApp, etc.), combiná `--output-scale`, `--fps` y `--maxrate` reducidos:
+
+```bash
+python3 render.py \
+  --audio "tu_mezcla.mp3" \
+  --background "tu_fondo.mp4" \
+  --logo "logo_canal.png" --logo-b "logo_dj.png" \
+  --output "../output/preview_10min.mp4" \
+  --crf 28 --audio-bitrate 128k --output-scale 960:540 \
+  --maxrate 900k --bufsize 1800k --fps 24
+```
+
+Esto genera aproximadamente 8MB por minuto de video (≈75MB para 9-10 minutos),
+manteniendo buena legibilidad del logo, el espectro RGB y el marco de marca.
+Para el render **final** en alta calidad (1080p), usá los valores por defecto
+sin estas banderas de compresión.
 
 ## Notas importantes
 
